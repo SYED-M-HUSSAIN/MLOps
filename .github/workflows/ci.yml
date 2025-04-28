@@ -1,0 +1,35 @@
+name: AI PR Comment Bot with Anthropic
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install requests PyGithub
+        
+      - name: Print current working directory
+        run: pwd
+
+      - name: List files in .github/scripts
+        run: ls -l 
+
+
+      - name: Run Review Python Script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python $GITHUB_WORKSPACE/.github/scripts/review_script.py
+
