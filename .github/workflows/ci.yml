@@ -21,7 +21,7 @@ jobs:
         run: pwd
 
       - name: List files in .github/scripts
-        run: ls -l .github/scripts
+        run: ls -l 
 
 
       - name: Run Review Python Script
