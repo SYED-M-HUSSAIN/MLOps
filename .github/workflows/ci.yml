@@ -14,48 +14,64 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { owner, repo, number } = context.issue;
-            
-            // Step 1: Fetch PR Diff
-            const pr = await github.rest.pulls.get({
-              owner,
-              repo,
-              pull_number: number,
-            });
+            try {
+              const { owner, repo, number } = context.issue;
 
-            const diffUrl = pr.data.diff_url;
-            const diffResponse = await fetch(diffUrl, {
-              headers: {
-                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-                Accept: 'application/vnd.github.v3.diff'
+              // Step 1: Fetch PR Diff
+              const pr = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: number,
+              });
+
+              const diffUrl = pr.data.diff_url;
+              console.log('Fetched Diff URL:', diffUrl);  // Debug line
+
+              const diffResponse = await fetch(diffUrl, {
+                headers: {
+                  Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+                  Accept: 'application/vnd.github.v3.diff'
+                }
+              });
+
+              const diffText = await diffResponse.text();
+              console.log('Fetched Diff Text:', diffText);  // Debug line
+
+              // Step 2: Call Anthropic API (Claude)
+              const anthropicResponse = await fetch("https://api.anthropic.com/v1/completions", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${process.env.ANTHROPIC_API_KEY}`
+                },
+                body: JSON.stringify({
+                  model: "claude-1",  // Use the correct model name
+                  prompt: `Review the following code changes:\n${diffText}\nPlease provide feedback on code quality, readability, bugs, and optimization opportunities.`,
+                  max_tokens: 1000,
+                  temperature: 0.2
+                })
+              });
+
+              const anthropicData = await anthropicResponse.json();
+              console.log('Anthropic API Response:', anthropicData);  // Debug line
+
+              if (!anthropicData.completion) {
+                throw new Error('No completion found in the response');
               }
-            });
-            const diffText = await diffResponse.text();
 
-            // Step 2: Call Anthropic API (Claude)
-            const anthropicResponse = await fetch("https://api.anthropic.com/v1/completions", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.ANTHROPIC_API_KEY}`
-              },
-              body: JSON.stringify({
-                model: "claude-1", // Use the correct model name (Claude-1, Claude-2, etc.)
-                prompt: `Review the following code changes:\n${diffText}\nPlease provide feedback on code quality, readability, bugs, and optimization opportunities.`,
-                max_tokens: 1000,
-                temperature: 0.2
-              })
-            });
+              const reviewComment = anthropicData.completion;
 
-            const anthropicData = await anthropicResponse.json();
-            const reviewComment = anthropicData.completion;
+              // Step 3: Post Review Comment
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: number,
+                body: `🤖 AI Code Review (via Claude):\n\n${reviewComment}`
+              });
 
-            // Step 3: Post Review Comment
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number: number,
-              body: `🤖 AI Code Review (via Claude):\n\n${reviewComment}`
-            });
+            } catch (error) {
+              console.error('Error occurred:', error.message);
+              throw error;  // Re-throw to indicate failure in GitHub Actions logs
+            }
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
