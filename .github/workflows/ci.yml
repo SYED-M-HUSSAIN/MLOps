@@ -1,0 +1,61 @@
+name: AI PR Comment Bot with Anthropic
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Comment using Anthropic Claude
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo, number } = context.issue;
+            
+            // Step 1: Fetch PR Diff
+            const pr = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: number,
+            });
+
+            const diffUrl = pr.data.diff_url;
+            const diffResponse = await fetch(diffUrl, {
+              headers: {
+                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+                Accept: 'application/vnd.github.v3.diff'
+              }
+            });
+            const diffText = await diffResponse.text();
+
+            // Step 2: Call Anthropic API (Claude)
+            const anthropicResponse = await fetch("https://api.anthropic.com/v1/completions", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.ANTHROPIC_API_KEY}`
+              },
+              body: JSON.stringify({
+                model: "claude-1", // Use the correct model name (Claude-1, Claude-2, etc.)
+                prompt: `Review the following code changes:\n${diffText}\nPlease provide feedback on code quality, readability, bugs, and optimization opportunities.`,
+                max_tokens: 1000,
+                temperature: 0.2
+              })
+            });
+
+            const anthropicData = await anthropicResponse.json();
+            const reviewComment = anthropicData.completion;
+
+            // Step 3: Post Review Comment
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: number,
+              body: `🤖 AI Code Review (via Claude):\n\n${reviewComment}`
+            });
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
