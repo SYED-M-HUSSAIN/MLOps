@@ -24,4 +24,4 @@ jobs:
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: python scripts/review_script.py
+        run: python .github/scripts/review_script.py
