@@ -1,4 +1,5 @@
-name: PR Comment Bot
+name: AI PR Comment Bot with Anthropic
+
 
 on:
   pull_request:
@@ -7,18 +8,44 @@ on:
 jobs:
   comment:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Comment on PR
-        uses: actions/github-script@v7
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+    
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const comment = "🚀 Thank you for your pull request! Our team will review it shortly.";
-            const { owner, repo, number } = context.issue;
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number: number,
-              body: comment
-            });
+          python-version: '3.10'
+
+     
+      
+
+      - name: Install dependencies
+        run: |
+          pip install requests PyGithub
+
+      - name: Print current working directory
+        run: pwd
+
+      - name: List all files in the workspace
+        run: ls -l $GITHUB_WORKSPACE
+
+      - name: List files in .github/scripts
+        run: ls -l $GITHUB_WORKSPACE/.github/
+
+      - name: Make the review script executable
+        run: chmod +x $GITHUB_WORKSPACE/review_script.py
+
+      - name: Check Python version
+        run: python --version
+
+      - name: Run Review Python Script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python $GITHUB_WORKSPACE/review_script.py
+
