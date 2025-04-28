@@ -16,13 +16,21 @@ jobs:
       - name: Install dependencies
         run: |
           pip install requests PyGithub
-        
+
       - name: Print current working directory
         run: pwd
 
-      - name: List 
-        run: ls -l 
+      - name: List all files in the workspace
+        run: ls -l $GITHUB_WORKSPACE
 
+      - name: List files in .github/scripts
+        run: ls -l $GITHUB_WORKSPACE/.github/
+
+      - name: Make the review script executable
+        run: chmod +x $GITHUB_WORKSPACE/review_script.py
+
+      - name: Check Python version
+        run: python --version
 
       - name: Run Review Python Script
         env:
@@ -31,5 +39,4 @@ jobs:
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: python $GITHUB_WORKSPACE/.github/scripts/review_script.py
-
+        run: python $GITHUB_WORKSPACE/review_script.py
