@@ -6,16 +6,19 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-def fetch_pr_diff(repo, pr_number):
-    pr = repo.get_pull(pr_number)
-    diff_url = pr.diff_url
+import os
+import requests
 
-    response = requests.get(diff_url, headers={
-        "Authorization": f"token {repo._requester._AuthorizationHeader}",
+def fetch_pr_diff(env):
+    diff_url = f"https://api.github.com/repos/{env['repo_owner']}/{env['repo_name']}/pulls/{env['pr_number']}"
+    headers = {
+        "Authorization": f"token {env['github_token']}",
         "Accept": "application/vnd.github.v3.diff"
-    })
+    }
+
+    response = requests.get(diff_url, headers=headers)
 
     if response.status_code != 200:
-        raise Exception(f"Failed to fetch PR diff: {response.status_code}")
+        raise Exception(f"Failed to fetch PR diff: {response.status_code} - {response.text}")
 
     return response.text

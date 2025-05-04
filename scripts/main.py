@@ -13,7 +13,7 @@ def main():
     env = load_env_variables()
     repo = get_repo(env)
 
-    diff_text = fetch_pr_diff(repo, env["pr_number"])
+    diff_text = fetch_pr_diff(env)
     prompt = apply_custom_evaluation(diff_text, strategy="default")
     review_comment = get_review_from_anthropic(env["anthropic_api_key"], prompt)
 
