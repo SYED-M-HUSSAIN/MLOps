@@ -1,9 +1,8 @@
-import os
 import sys
-
+import os
 
 # Add the scripts directory to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'scripts')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
 class Config:
