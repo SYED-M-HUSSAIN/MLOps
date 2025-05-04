@@ -42,7 +42,7 @@ jobs:
       - name: Run AI PR Review Python Script
         run: |
           echo "Running AI PR Reviewer..."
-          python scripts/main.py
+          poetry run python scripts/main.py
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
