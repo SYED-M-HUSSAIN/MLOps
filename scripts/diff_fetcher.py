@@ -5,23 +5,17 @@ import os
 # Add the scripts directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from scripts.config import Config
-from scripts.github_client import get_pull_request
 
-
-def fetch_pr_diff(repo):
-    pr = get_pull_request(repo)
+def fetch_pr_diff(repo, pr_number):
+    pr = repo.get_pull(pr_number)
     diff_url = pr.diff_url
-    print(f"📄 Fetching diff from: {diff_url}")
 
-    headers = {
-        "Authorization": f"token {Config.GITHUB_TOKEN}",
+    response = requests.get(diff_url, headers={
+        "Authorization": f"token {repo._requester._AuthorizationHeader}",
         "Accept": "application/vnd.github.v3.diff"
-    }
+    })
 
-    response = requests.get(diff_url, headers=headers)
-    response.raise_for_status()
+    if response.status_code != 200:
+        raise Exception(f"Failed to fetch PR diff: {response.status_code}")
 
-    diff_text = response.text
-    print(f"✅ Diff fetched ({len(diff_text)} characters)")
-    return diff_text
+    return response.text

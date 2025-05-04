@@ -23,32 +23,20 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
-        run: |
-          poetry install
+        run: poetry install
 
-      - name: Print current working directory
-        run: pwd
+      - name: Export PYTHONPATH
+        run: echo "PYTHONPATH=$GITHUB_WORKSPACE/scripts" >> $GITHUB_ENV
 
-      - name: List all files in the workspace
-        run: ls -l $GITHUB_WORKSPACE
-
-      - name: List files in .github/scripts
-        run: ls -l $GITHUB_WORKSPACE/.github/
-
-      - name: Set PYTHONPATH to include scripts directory
-        run: |
-          echo "PYTHONPATH=$GITHUB_WORKSPACE/scripts" >> $GITHUB_ENV
-
-      - name: Run AI PR Review Python Script
-        run: |
-          echo "Running AI PR Reviewer..."
-          REVIEW=$(poetry run python scripts/main.py)
-          echo "🔍 Review Comment Posted Below:"
-          echo "$REVIEW"
-
+      - name: Run AI PR Reviewer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          echo "Running AI PR Reviewer..."
+          REVIEW=$(poetry run python scripts/main.py)
+          echo "🔍 Review Comment Posted Below:"
+          echo "$REVIEW"

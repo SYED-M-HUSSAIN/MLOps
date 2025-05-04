@@ -4,14 +4,12 @@ import os
 # Add the scripts directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-
-def load_template(template_name: str = "default") -> str:
-    base_path = os.path.join(os.path.dirname(__file__), "../custom_evaluations")
-    template_file = os.path.join(base_path, f"{template_name}.md")
-
+def apply_custom_evaluation(diff_text, strategy="default"):
+    template_path = f"custom_evaluations/{strategy}.md"
     try:
-        with open(template_file, "r") as f:
-            return f.read()
+        with open(template_path, "r") as f:
+            template = f.read()
     except FileNotFoundError:
-        print(f"⚠️ Template {template_name} not found. Proceeding without it.")
-        return ""
+        template = "Please review the following code changes:"
+
+    return f"{template}\n\n{diff_text}"
