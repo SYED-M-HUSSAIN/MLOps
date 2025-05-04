@@ -1,4 +1,10 @@
 from github import Github
+import sys
+import os
+
+# Add the scripts directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'scripts')))
+
 from scripts.config import Config
 
 
