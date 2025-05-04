@@ -1,6 +1,6 @@
 import requests
-from config import ANTHROPIC_API_KEY
 import os
+from config import ANTHROPIC_API_KEY
 
 def call_anthropic_api(diff_text):
     # Load template prompt from file
@@ -11,11 +11,17 @@ def call_anthropic_api(diff_text):
     full_prompt = template_prompt.replace("{{diff}}", diff_text)
 
     url = "https://api.anthropic.com/v1/messages"
+    
+    # Updated headers with correct API key format
     headers = {
         "Content-Type": "application/json",
         "x-api-key": ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01"
     }
+    
+    # Ensure API key is not empty
+    if not ANTHROPIC_API_KEY or ANTHROPIC_API_KEY.strip() == "":
+        raise ValueError("Anthropic API key is missing or empty. Please check your configuration.")
     
     payload = {
         "model": "claude-3-7-sonnet-20250219",
