@@ -2,11 +2,12 @@ name: AI PR Comment Bot with Anthropic
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]
 
 jobs:
   comment:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -17,20 +18,41 @@ jobs:
           python-version: '3.10'
 
       - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python3 -
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Add Poetry to PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Configure Poetry
+        run: poetry config virtualenvs.create false
 
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
 
-      - name: Run AI Review Bot
+      - name: Print PR environment variables
+        run: |
+          echo "GITHUB_EVENT_NAME: ${{ github.event_name }}"
+          echo "PR_NUMBER: ${{ github.event.pull_request.number }}"
+          echo "REPO: ${{ github.repository }}"
+
+      - name: List workspace files
+        run: |
+          pwd
+          ls -R
+
+      - name: Run AI PR Reviewer and Echo Review Comment
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: poetry run python scripts/main.py
+        run: |
+          echo "Running AI PR Reviewer..."
+          python scripts/main.py
+
+          # Capture the review comment from the script output and echo it
+          echo "🔍 Review Comment Posted:"
+          echo ${{ steps.run.outputs.review_comment }}
+
+        
 
