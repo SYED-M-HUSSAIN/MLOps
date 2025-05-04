@@ -17,26 +17,30 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
       - name: Install dependencies
-        run: poetry install
+        run: |
+          pip install requests PyGithub
 
-      - name: Export PYTHONPATH
-        run: echo "PYTHONPATH=$GITHUB_WORKSPACE/scripts" >> $GITHUB_ENV
+      - name: Print current working directory
+        run: pwd
 
-      - name: Run AI PR Reviewer
+      - name: List all files in the workspace
+        run: ls -l $GITHUB_WORKSPACE
+
+      - name: List files in .github/scripts
+        run: ls -l $GITHUB_WORKSPACE/.github/
+
+      - name: Make the review script executable
+        run: chmod +x $GITHUB_WORKSPACE/scripts/main.py
+
+      - name: Check Python version
+        run: python --version
+
+      - name: Run Review Python Script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          echo "Running AI PR Reviewer..."
-          REVIEW=$(poetry run python scripts/main.py)
-          echo "🔍 Review Comment Posted Below:"
-          echo "$REVIEW"
+        run: python $GITHUB_WORKSPACE/scripts/main.py

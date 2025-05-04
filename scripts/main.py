@@ -1,26 +1,23 @@
-import sys
-import os
+from github_utils import fetch_pr_diff
+from anthropic_utils import call_anthropic_api
+from comment_utils import post_review_comment
 
-# Add the scripts directory to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from scripts.config import load_env_variables
-from scripts.github_client import get_repo, post_review_comment
-from scripts.diff_fetcher import fetch_pr_diff
-from scripts.anthropic_client import get_review_from_anthropic
-from scripts.reviewer import apply_custom_evaluation
-
+# Main function
 def main():
-    env = load_env_variables()
-    repo = get_repo(env)
+    try:
+        # Step 1: Fetch PR diff
+        diff_text = fetch_pr_diff()
 
-    diff_text = fetch_pr_diff(env)
-    prompt = apply_custom_evaluation(diff_text, strategy="default")
-    review_comment = get_review_from_anthropic(env["anthropic_api_key"], prompt)
+        # Step 2: Call Anthropic API for review
+        review_comment = call_anthropic_api(diff_text)
+        print(f"Received Review Comment: {review_comment[:1000]}...")  # Debugging first 1000 chars
 
-    post_review_comment(repo, env["pr_number"], review_comment)
-
-    # This line is necessary for GitHub Action echo
-    print(review_comment)
+        # Step 3: Post review comment on PR
+        post_review_comment(review_comment)
+        
+    except Exception as e:
+        print(f"Error: {e}")
+        raise e
 
 if __name__ == "__main__":
     main()
