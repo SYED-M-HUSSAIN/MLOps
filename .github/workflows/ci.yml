@@ -39,7 +39,7 @@ jobs:
       - name: Check Python version
         run: python --version
 
-      - name: Run Review Python Script
+      - name: Run Review Python Scripts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
