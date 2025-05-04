@@ -1,3 +1,9 @@
+import sys
+import os
+
+# Add the scripts directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'scripts')))
+
 from scripts.github_client import get_repo, post_review_comment
 from scripts.diff_fetcher import fetch_pr_diff
 from scripts.anthropic_client import call_anthropic_api
