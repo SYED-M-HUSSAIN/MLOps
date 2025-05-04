@@ -2,7 +2,7 @@ name: AI PR Comment Bot with Anthropic
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize]
 
 jobs:
   comment:
@@ -17,42 +17,31 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Configure Poetry
-        run: poetry config virtualenvs.create false
-
       - name: Install dependencies
-        run: poetry install --no-root
-
-      - name: Print PR environment variables
         run: |
-          echo "GITHUB_EVENT_NAME: ${{ github.event_name }}"
-          echo "PR_NUMBER: ${{ github.event.pull_request.number }}"
-          echo "REPO: ${{ github.repository }}"
+          poetry install
 
-      - name: List workspace files
+      - name: Print current working directory
+        run: pwd
+
+      - name: List all files in the workspace
+        run: ls -l $GITHUB_WORKSPACE
+
+      - name: List files in .github/scripts
+        run: ls -l $GITHUB_WORKSPACE/.github/
+
+      - name: Set PYTHONPATH to include scripts directory
         run: |
-          pwd
-          ls -R
+          echo "PYTHONPATH=$GITHUB_WORKSPACE/scripts" >> $GITHUB_ENV
 
-      - name: Run AI PR Reviewer and Echo Review Comment
+      - name: Run AI PR Review Python Script
+        run: |
+          echo "Running AI PR Reviewer..."
+          python scripts/main.py
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          echo "Running AI PR Reviewer..."
-          python scripts/main.py
-
-          # Capture the review comment from the script output and echo it
-          echo "🔍 Review Comment Posted:"
-          echo ${{ steps.run.outputs.review_comment }}
-
-        
-
