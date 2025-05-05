@@ -1,9 +1,10 @@
-# Code Quality Evaluation Criteria
+## Code Quality
 
-- Is the code modular and well-structured?
-- Are functions and classes named appropriately?
-- Is there unnecessary repetition or redundancy?
-- Are error-handling practices implemented correctly?
+Assess the structure, consistency, and maintainability of the code.
 
-
-Give me the check list if each criteria passses or fails
+### Consider:
+- Naming conventions
+- Modularity and reuse of code
+- Separation of concerns
+- Use of meaningful constants instead of magic numbers
+- Adherence to Pythonic idioms
