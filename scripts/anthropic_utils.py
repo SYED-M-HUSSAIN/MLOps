@@ -1,6 +1,8 @@
 import requests
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from .config import ANTHROPIC_API_KEY
-from .utils import load_criteria  # assuming you use markdown criteria
+from scripts.utils import load_criteria  # assuming you use markdown criteria
 
 def call_anthropic_api(diff_text):
     url = "https://api.anthropic.com/v1/messages"
