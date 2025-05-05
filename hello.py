@@ -74,7 +74,7 @@ def main():
         post_review_comment(review_comment)
         
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error in the MLOps execution: {e}")
         raise e
 
 if __name__ == "__main__":
