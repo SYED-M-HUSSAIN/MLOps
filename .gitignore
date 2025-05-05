@@ -1,0 +1,74 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.pyo
+
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# Editor/IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment variables & configs
+.env
+*.env
+*.key
+config.json
+config.yaml
+config.ini
+
+# API secrets
+secrets/
+*.pem
+*.crt
+*.cert
+
+# Test artifacts
+*.coverage
+coverage.xml
+htmlcov/
+pytest_cache/
+.cache/
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# Evaluation criteria artifacts
+evaluation_criteria/*.md~
+evaluation_criteria/README.md~
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Dependency files
+poetry.lock
+Pipfile.lock
+
+# GitHub Actions artifacts
+*.log
+*.bak
+.nox/
+.tox/
+.github/workflows/*.bak
+
+# Misc
+*.bak
+*.tmp
+*.swp
