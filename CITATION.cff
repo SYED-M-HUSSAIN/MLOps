@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Syed Muhammad Hussain"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+    affiliation: "BEAM AI"
+title: "AI-Powered Code Review Automation with Anthropic Claude"
+version: 0.1.0
+doi: 10.5281/zenodo.0000000
+date-released: 2025-05-05
+url: "https://github.com/syed-m-hussain/MLOps"
+repository-code: "https://github.com//MLOps"
+license: MIT
+keywords:
+  - code-review
+  - llm
+  - anthropic-claude
+  - github-actions
+  - mlops
+  - ai
+abstract: >
+  A modular, CI-integrated code review framework that leverages Anthropic Claude to
+  automatically review pull requests. The system analyzes code diffs, applies human-centric
+  evaluation criteria, and posts structured, actionable feedback as PR comments.
+references:
+  - type: software
+    authors:
+      - name: "Anthropic"
+    title: "Claude API"
+    url: "https://www.anthropic.com/"
+  - type: software
+    authors:
+      - name: "GitHub"
+    title: "GitHub REST API"
+    url: "https://docs.github.com/en/rest"
