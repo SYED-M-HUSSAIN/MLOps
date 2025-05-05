@@ -1,5 +1,8 @@
 import requests
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from .config import ANTHROPIC_API_KEY
+from scripts.utils import load_criteria  # assuming you use markdown criteria
 
 def call_anthropic_api(diff_text):
     url = "https://api.anthropic.com/v1/messages"
@@ -9,16 +12,20 @@ def call_anthropic_api(diff_text):
         "anthropic-version": "2023-06-01"
     }
 
+    # Load system-level evaluation instructions
+    system_prompt = load_criteria("evaluation_criteria/code_quality.md") 
+
     payload = {
         "model": "claude-3-7-sonnet-20250219",
         "max_tokens": 1000,
         "temperature": 0.2,
+        "system": system_prompt,
         "messages": [
             {
                 "role": "user",
                 "content": (
-                    f"Review the following code changes:\n{diff_text}\n"
-                    "Please provide feedback on code quality, readability, bugs, and optimization opportunities."
+                    f"Here is the code diff for review:\n\n{diff_text}\n\n"
+                    "Please analyze this code and share your feedback."
                 )
             }
         ]
