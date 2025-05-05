@@ -176,3 +176,5 @@ This project is released under the MIT License. See `LICENSE` for more informati
 - [Anthropic Claude API Docs](https://docs.anthropic.com/)
 - [GitHub REST API](https://docs.github.com/en/rest)
 - [Best Practices for LLM Apps](https://github.com/openai/openai-cookbook)
+
+### Author : Syed Muhammad Hussan
