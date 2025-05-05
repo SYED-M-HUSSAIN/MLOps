@@ -4,3 +4,6 @@
 - Are functions and classes named appropriately?
 - Is there unnecessary repetition or redundancy?
 - Are error-handling practices implemented correctly?
+
+
+Give me the check list if each criteria passses or fails
